@@ -38,6 +38,6 @@ class productRegister(forms.ModelForm):
 
     class Meta:
         model = Product
-        exclude = ('is_active')
+        exclude = ('is_active',)
         fields = ['name', 'reference', 'category', 'purchase_price', 'sale_price', 'alert_threshold']
 

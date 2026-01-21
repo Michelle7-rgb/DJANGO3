@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accès refusé</title>
+</head>
+<body>
+    <h1>⛔ Accès non autorisé</h1>
+
+    <p>
+        Vous n’avez pas les permissions nécessaires pour accéder à cette page.
+    </p>
+
+    <a href="{% url 'dashboard' %}">Retour au tableau de bord</a> |
+    <a href="{% url 'logout' %}">Se déconnecter</a>
+</body>
+</html>

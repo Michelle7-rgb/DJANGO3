@@ -44,6 +44,13 @@ def logoutView(request):
     logout(request)
     return redirect('/login')
 
+from django.shortcuts import redirect
+
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return redirect('login')
+
 @login_required
 def me(request):
     user = request.user  # utilisateur déjà authentifié
@@ -61,6 +68,9 @@ def me(request):
 
     return render(request, template)
 
+def unauthorizedView(request):
+    return render(request, 'unauthorized.html')
+
 
 
 ####################################
@@ -68,16 +78,16 @@ def me(request):
 ####################################  
 @login_required
 def productList(request): # pdg et stock manager
-    if request.user.role != 'STOCKMANAGER' or request.user.role !='PDG':
+    if request.user.role != 'STOCK_MANAGER' and request.user.role != 'PDG':
         return redirect('unauthorized')
     
     products = Product.objects.filter(is_active=True)
-    return # render avec page html des produits et le tableau products en parametres
+    return render(request, 'inventory/product_list.html', {'products': products})
 
 @login_required
 def productCreate(request): # stockmanager
 
-    if request.user.role != 'STOCKMANAGER':
+    if request.user.role != 'STOCK_MANAGER':
         return redirect('unauthorized')
     
     if request.method == "POST":
@@ -88,25 +98,31 @@ def productCreate(request): # stockmanager
         else:
             form = productRegister()
 
-            return # render(request,... ) pour création de produits
+            return  render(request, 'inventory/product_form.html', {'form': form} ) 
+        
+    else:
+        form = productRegister()
+        return  render(request, 'inventory/product_form.html', {'form': form} ) 
         
 @login_required
 def productUpdate(request, id): #stock manager
-    product = get_object_or_404(product, id=id)
+    product = get_object_or_404(Product, id=id)
+    form = productRegister(instance=product)
 
-    if request.user.role != 'STOCKMANAGER':
+    if request.user.role != 'STOCK_MANAGER':
         return redirect('unauthorized')
     
     if request.method == 'POST':
         form = productRegister(request.POST, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('productList')
+            return redirect('product_list')
         
     else:
+        
         form = productRegister(instance=product)
 
-    return # render du produit update.html...form: form
+        return render(request, 'inventory/product_form.html', {'form': form})
 
 @login_required
 @require_POST  # sécurité : suppression seulement via POST
